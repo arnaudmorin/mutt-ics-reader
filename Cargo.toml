@@ -11,4 +11,5 @@ chrono = "0.4.45"
 chrono-tz = "0.10.4"
 icalendar = "0.17.14"
 ratatui = "0.30.2"
-windows-timezones = { version = "0.5.1", features = ["chrono-tz"] }
+strum = "0.27"
+windows-timezones = { version = "0.5.1", features = ["chrono-tz", "strum"] }

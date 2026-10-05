@@ -4,6 +4,7 @@ use std::fs;
 use chrono::{DateTime, Local, TimeZone};
 use chrono_tz::Tz;
 use icalendar::{Calendar, CalendarDateTime, Component, DatePerhapsTime, EventLike};
+use strum::IntoEnumIterator;
 use windows_timezones::WindowsTimezone;
 
 // Our own model: plain owned strings and local times, no parser types leak past this point.
@@ -81,9 +82,19 @@ fn to_local(date: DatePerhapsTime) -> Option<DateTime<Local>> {
     }
 }
 
-// Try an IANA name first, then fall back to the Windows name table.
+// Try an IANA name first, then the Windows key ("Romance Standard Time"), then the
+// Windows display name Outlook sometimes emits ("(UTC+01:00) Brussels, Copenhagen, ...").
 fn resolve_tz(tzid: &str) -> Option<Tz> {
     tzid.parse::<Tz>()
         .ok()
         .or_else(|| tzid.parse::<WindowsTimezone>().ok().map(Tz::from))
+        .or_else(|| windows_display_name(tzid).map(Tz::from))
+}
+
+// The "(UTC+01:00) " prefix is dropped before comparing: older Windows versions wrote
+// "(GMT+01:00)" and the offset shown there changed over the years, the city list did not.
+fn windows_display_name(tzid: &str) -> Option<WindowsTimezone> {
+    let cities = |name: &str| name.split_once(") ").map(|(_, rest)| rest.trim().to_string());
+    let wanted = cities(tzid)?;
+    WindowsTimezone::iter().find(|tz| cities(tz.description()).as_deref() == Some(wanted.as_str()))
 }

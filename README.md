@@ -5,8 +5,9 @@ file in a small TUI, or prints them as plain text so mutt and NeoMutt can
 display an invitation inline.
 
 Dates are converted to your local time zone, including the Windows time zone
-names that Outlook and Exchange put in their invitations
-(`Romance Standard Time`, `Pacific Standard Time`, ...).
+names that Outlook and Exchange put in their invitations, both as keys
+(`Romance Standard Time`, `Pacific Standard Time`, ...) and as display names
+(`(UTC+01:00) Brussels, Copenhagen, Madrid, Paris`, ...).
 
 ## Install
 
